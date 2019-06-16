@@ -1,0 +1,2 @@
+web: npm run --prefix client start -p 4000
+api: bundle exec rails server -p 3000
