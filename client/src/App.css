@@ -106,3 +106,13 @@ input[placeholder] {
   margin-right: 5px;
   cursor: default;
 }
+
+.pagination {
+  margin-top: 240px;
+  display: inline-block;
+}
+
+.pagination a {
+  padding: 8px 16px;
+  text-decoration: none;
+}
