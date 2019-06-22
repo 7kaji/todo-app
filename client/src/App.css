@@ -107,9 +107,19 @@ input[placeholder] {
   cursor: default;
 }
 
+.paginationCenter {
+  text-align: center;
+}
+
 .pagination {
   margin-top: 240px;
   display: inline-block;
+  text-align: center;
+}
+
+.pagination .currentPage {
+  margin-right: 10px;
+  margin-left: 10px;
 }
 
 .pagination a {

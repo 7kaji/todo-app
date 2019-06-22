@@ -2,6 +2,7 @@ import React, { useState, useEffect, Fragment } from 'react'
 import axios from 'axios'
 import parse from 'parse-link-header'
 import queryString from 'query-string'
+import Button from '@material-ui/core/Button';
 
 interface ITodo {
   id: number
@@ -134,10 +135,12 @@ function Todos(): JSX.Element {
           })}
         </ul>
       </div>
-      <div className="pagination">
-        { currentPage !== '1' && <button onClick={() => handlePage(prevPage.page)}>prev</button> }
-        <span>{ currentPage } of { totalPage }</span>
-        { nextPage.page !== '-1' && <button onClick={() => handlePage(nextPage.page)}>next</button> }
+      <div className="paginationCenter">
+        <div className="pagination">
+          { currentPage !== '1' && <Button variant="outlined" onClick={() => handlePage(prevPage.page)}>prev</Button> }
+          <span className="currentPage">{ currentPage } of { totalPage }</span>
+          { nextPage.page !== '-1' && <Button variant="outlined" onClick={() => handlePage(nextPage.page)}>next</Button> }
+        </div>
       </div>
     </Fragment>
   )
