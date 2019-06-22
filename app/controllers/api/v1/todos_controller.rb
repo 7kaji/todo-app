@@ -7,7 +7,7 @@ module Api
       def index
         @todos = Todo.all.order(id: :desc)
 
-        render json: @todos
+        paginate json: @todos, per_page: 5
       end
 
       # GET /todos/1
