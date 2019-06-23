@@ -2,7 +2,7 @@ import React, { useState, useEffect, Fragment } from 'react'
 import axios from 'axios'
 import parse from 'parse-link-header'
 import queryString from 'query-string'
-import Button from '@material-ui/core/Button';
+import Button from '@material-ui/core/Button'
 
 interface ITodo {
   id: number
@@ -25,7 +25,7 @@ function Todos(): JSX.Element {
   const [prevPage, setPrevPage] = useState<IPage>({page: '0', rel: '', url: ''})
   const [nextPage, setNextPage] = useState<IPage>({page: '-1', rel: '', url: ''})
   const [totalPage, setTotalPage] = useState<number>(0)
-  const [totalCount, setTotalCount] = useState<number>(0)
+  // const [totalCount, setTotalCount] = useState<number>(0)
 
   useEffect(
     () => {
@@ -55,8 +55,8 @@ function Todos(): JSX.Element {
         setNextPage({page: '-1', rel: '', url: ''})
       }
       setCurrentPage(response.headers['x-page'])
-      setTotalCount(response.headers['x-total'])
-      setTotalPage(Math.floor((Number(response.headers['x-total']) + Number(response.headers['x-per-page'])) / response.headers['x-per-page']))
+      // setTotalCount(response.headers['x-total'])
+      setTotalPage(Math.ceil(Number(response.headers['x-total']) / response.headers['x-per-page']))
 
       setTodos(response.data)
     })
@@ -81,7 +81,7 @@ function Todos(): JSX.Element {
   const handlePage = (page: string): void => {
     setCurrentPage(page)
     getTodos(page)
-    window.history.pushState(null, `$Todos:${page}目`, `/?page=${page}`)
+    window.history.pushState({}, '', `?page=${page}`)
   }
 
   const updateTodo = (e: React.ChangeEvent<HTMLInputElement>, id: number): void => {
