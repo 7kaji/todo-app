@@ -57,7 +57,6 @@ function Todos(): JSX.Element {
       setCurrentPage(response.headers['x-page'])
       // setTotalCount(response.headers['x-total'])
       setTotalPage(Math.ceil(Number(response.headers['x-total']) / response.headers['x-per-page']))
-
       setTodos(response.data)
     })
     .catch(error => console.log(error))
