@@ -3,6 +3,7 @@ import axios from 'axios'
 import parse from 'parse-link-header'
 import queryString from 'query-string'
 import Button from '@material-ui/core/Button'
+import { Auth } from "aws-amplify"
 
 interface ITodo {
   id: number
@@ -26,18 +27,24 @@ function Todos(): JSX.Element {
   const [nextPage, setNextPage] = useState<IPage>({page: '-1', rel: '', url: ''})
   const [totalPage, setTotalPage] = useState<number>(0)
   // const [totalCount, setTotalCount] = useState<number>(0)
+  const [token, setToken] = useState<string>('')
 
-  useEffect(
-    () => {
-      const parsedHash = queryString.parse(window.location.search)
-      getTodos(String(parsedHash.page))
-    }, []
-  )
+  useEffect(() => {
+    const parsedHash = queryString.parse(window.location.search)
+    getTodos(String(parsedHash.page))
+  }, [])
 
   const getTodos = async(page: string) => {
     const stringified = queryString.stringify({page})
     const pageParamsString = (page === '1') ? '' : `?${stringified}`
-    await axios.get(`/api/v1/todos${pageParamsString}`)
+
+    const jwt = await Auth.currentAuthenticatedUser().then(user => {
+      return user.signInUserSession.idToken.jwtToken
+    })
+    setToken(jwt)
+
+    const headers = { Authorization: `Bearer ${jwt}` }
+    await axios.get(`/api/v1/todos${pageParamsString}`, { headers })
     .then(response => {
       const parsedLinkHeaders = parse(response.headers.link) || {}
 
@@ -57,7 +64,6 @@ function Todos(): JSX.Element {
       setCurrentPage(response.headers['x-page'])
       // setTotalCount(response.headers['x-total'])
       setTotalPage(Math.ceil(Number(response.headers['x-total']) / response.headers['x-per-page']))
-
       setTodos(response.data)
     })
     .catch(error => console.log(error))
@@ -65,7 +71,9 @@ function Todos(): JSX.Element {
 
   const createTodo = (e: React.KeyboardEvent<HTMLDivElement>): void => {
     if (e.key === 'Enter' && !(inputValue === '')) {
-      axios.post('/api/v1/todos', {todo: {title: inputValue}})
+
+      const headers = { Authorization: `Bearer ${token}` }
+      axios.post('/api/v1/todos', {todo: {title: inputValue}}, { headers })
       .then(response => {
         setTodos([response.data, ...todos])
         setInputValue('')
@@ -85,7 +93,8 @@ function Todos(): JSX.Element {
   }
 
   const updateTodo = (e: React.ChangeEvent<HTMLInputElement>, id: number): void => {
-    axios.put(`/api/v1/todos/${id}`, {todo: {done: e.target.checked}})
+    const headers = { Authorization: `Bearer ${token}` }
+    axios.put(`/api/v1/todos/${id}`, {todo: {done: e.target.checked}}, { headers })
     .then(response => {
       const todoIndex = todos.findIndex(x => x.id === response.data.id)
       setTodos([...todos.slice(0, todoIndex), response.data, ...todos.slice(todoIndex + 1)])
@@ -94,7 +103,8 @@ function Todos(): JSX.Element {
   }
 
   const deleteTodo = (id: number): void => {
-    axios.delete(`/api/v1/todos/${id}`)
+    const headers = { Authorization: `Bearer ${token}` }
+    axios.delete(`/api/v1/todos/${id}`, { headers })
     .then(response => {
       const todoIndex = todos.findIndex(x => x.id === id)
       setTodos([...todos.slice(0, todoIndex), ...todos.slice(todoIndex + 1)])
